@@ -5,3 +5,4 @@ pillow
 pydantic
 requests
 firebase-admin
+uvicorn
