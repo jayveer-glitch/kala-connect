@@ -3,3 +3,4 @@ venv/
 serviceAccountKey.json
 __pycache__/
 DEPLOYMENT.md
+extract_firebase_env.py

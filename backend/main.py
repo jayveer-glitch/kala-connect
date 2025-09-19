@@ -28,35 +28,27 @@ class MockupRequest(BaseModel):
 load_dotenv()
 
 # Initialize Firebase using environment variables
-try:
-    # Try to use environment variables first (for production deployment)
-    firebase_credentials = {
-        "type": os.getenv("FIREBASE_TYPE", "service_account"),
-        "project_id": os.getenv("FIREBASE_PROJECT_ID"),
-        "private_key_id": os.getenv("FIREBASE_PRIVATE_KEY_ID"),
-        "private_key": os.getenv("FIREBASE_PRIVATE_KEY", "").replace('\\n', '\n'),
-        "client_email": os.getenv("FIREBASE_CLIENT_EMAIL"),
-        "client_id": os.getenv("FIREBASE_CLIENT_ID"),
-        "auth_uri": os.getenv("FIREBASE_AUTH_URI", "https://accounts.google.com/o/oauth2/auth"),
-        "token_uri": os.getenv("FIREBASE_TOKEN_URI", "https://oauth2.googleapis.com/token"),
-        "auth_provider_x509_cert_url": os.getenv("FIREBASE_AUTH_PROVIDER_X509_CERT_URL", "https://www.googleapis.com/oauth2/v1/certs"),
-        "client_x509_cert_url": os.getenv("FIREBASE_CLIENT_X509_CERT_URL")
-    }
-    
-    # Check if all required env vars are present
-    if all(firebase_credentials[key] for key in ["project_id", "private_key", "client_email"]):
-        cred = credentials.Certificate(firebase_credentials)
-        print("Using Firebase credentials from environment variables")
-    else:
-        # Fallback to local file for development
-        cred = credentials.Certificate("serviceAccountKey.json")
-        print("Using Firebase credentials from local file")
-        
-except Exception as e:
-    print(f"Error loading Firebase credentials: {e}")
-    # Fallback to local file
-    cred = credentials.Certificate("serviceAccountKey.json")
+firebase_credentials = {
+    "type": os.getenv("FIREBASE_TYPE", "service_account"),
+    "project_id": os.getenv("FIREBASE_PROJECT_ID"),
+    "private_key_id": os.getenv("FIREBASE_PRIVATE_KEY_ID"),
+    "private_key": os.getenv("FIREBASE_PRIVATE_KEY", "").replace('\\n', '\n'),
+    "client_email": os.getenv("FIREBASE_CLIENT_EMAIL"),
+    "client_id": os.getenv("FIREBASE_CLIENT_ID"),
+    "auth_uri": os.getenv("FIREBASE_AUTH_URI", "https://accounts.google.com/o/oauth2/auth"),
+    "token_uri": os.getenv("FIREBASE_TOKEN_URI", "https://oauth2.googleapis.com/token"),
+    "auth_provider_x509_cert_url": os.getenv("FIREBASE_AUTH_PROVIDER_X509_CERT_URL", "https://www.googleapis.com/oauth2/v1/certs"),
+    "client_x509_cert_url": os.getenv("FIREBASE_CLIENT_X509_CERT_URL")
+}
 
+# Check if all required env vars are present
+required_vars = ["project_id", "private_key", "client_email"]
+missing_vars = [var for var in required_vars if not firebase_credentials[var]]
+
+if missing_vars:
+    raise ValueError(f"Missing required Firebase environment variables: {missing_vars}")
+
+cred = credentials.Certificate(firebase_credentials)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
