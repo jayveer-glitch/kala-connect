@@ -2,3 +2,4 @@
 venv/
 serviceAccountKey.json
 __pycache__/
+DePLOYMENT.md
