@@ -1,0 +1,154 @@
+/* ===============================================
+   ENCHANTED MANUSCRIPT - ADVANCED ANIMATIONS
+   =============================================== */
+
+/* Paper Texture Animation */
+@keyframes paperBreathing {
+  0%, 100% { 
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+  25% { 
+    transform: scale(1.001) rotate(0.05deg);
+    filter: brightness(1.01);
+  }
+  50% { 
+    transform: scale(1.002) rotate(0.1deg);
+    filter: brightness(1.02);
+  }
+  75% { 
+    transform: scale(1.001) rotate(0.05deg);
+    filter: brightness(1.01);
+  }
+}
+
+/* Ink Drawing Effect */
+@keyframes inkDrawing {
+  0% {
+    color: transparent;
+    text-shadow: none;
+    background: linear-gradient(90deg, #0047AB 0%, #0047AB 0%, transparent 0%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  30% {
+    color: #0047AB;
+    text-shadow: 0 0 15px rgba(0, 71, 171, 0.9);
+    background: linear-gradient(90deg, #0047AB 0%, #0047AB 30%, transparent 30%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  60% {
+    color: #0047AB;
+    text-shadow: 0 0 10px rgba(0, 71, 171, 0.6);
+    background: linear-gradient(90deg, #0047AB 0%, #0047AB 100%, transparent 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  100% {
+    color: #2C2C2C;
+    text-shadow: none;
+    background: #2C2C2C;
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}
+
+/* Watercolor Bleeding Effect */
+@keyframes watercolorBleed {
+  0% {
+    transform: scale(0.1);
+    opacity: 0;
+    border-radius: 50%;
+    filter: blur(5px);
+  }
+  20% {
+    transform: scale(0.4);
+    opacity: 0.6;
+    border-radius: 40%;
+    filter: blur(3px);
+  }
+  50% {
+    transform: scale(0.8);
+    opacity: 0.4;
+    border-radius: 30%;
+    filter: blur(2px);
+  }
+  80% {
+    transform: scale(1);
+    opacity: 0.2;
+    border-radius: 20%;
+    filter: blur(1px);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.15;
+    border-radius: 20px;
+    filter: blur(0px);
+  }
+}
+
+/* Mystical Shimmer Effect */
+@keyframes mysticalShimmer {
+  0% { 
+    background-position: -200% 0;
+    filter: brightness(1);
+  }
+  25% {
+    filter: brightness(1.1);
+  }
+  50% { 
+    background-position: 0% 0;
+    filter: brightness(1.2);
+  }
+  75% {
+    filter: brightness(1.1);
+  }
+  100% { 
+    background-position: 200% 0;
+    filter: brightness(1);
+  }
+}
+
+/* Utility Classes */
+.breathing-paper {
+  animation: paperBreathing 12s ease-in-out infinite;
+}
+
+.ink-drawing {
+  animation: inkDrawing 3s ease-in-out forwards;
+}
+
+.watercolor-bleeding {
+  animation: watercolorBleed 2.5s ease-out forwards;
+}
+
+.mystical-shimmer {
+  background: linear-gradient(90deg, #2C2C2C 0%, #0047AB 50%, #2C2C2C 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: mysticalShimmer 4s ease-in-out infinite;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  @keyframes paperBreathing {
+    0%, 100% { 
+      transform: scale(1) rotate(0deg);
+    }
+    50% { 
+      transform: scale(1.001) rotate(0.05deg);
+    }
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
