@@ -1,0 +1,35 @@
+{
+  "pages": {
+    "/page": [
+      "static/chunks/webpack.js",
+      "static/css/vendors.css",
+      "static/chunks/vendors.js",
+      "static/chunks/main-app.js",
+      "static/chunks/_app-pages-browser_app_components_ArtisticCursor_tsx-_app-pages-browser_app_components_Custom-41ea4c.js",
+      "static/chunks/app/page.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack.js",
+      "static/css/vendors.css",
+      "static/chunks/vendors.js",
+      "static/chunks/main-app.js",
+      "static/css/app/layout.css",
+      "static/chunks/app/layout.js"
+    ],
+    "/gallery/page": [
+      "static/chunks/webpack.js",
+      "static/css/vendors.css",
+      "static/chunks/vendors.js",
+      "static/chunks/main-app.js",
+      "static/chunks/_app-pages-browser_app_components_ArtisticCursor_tsx-_app-pages-browser_app_components_Custom-41ea4c.js",
+      "static/chunks/app/gallery/page.js"
+    ],
+    "/upload/page": [
+      "static/chunks/webpack.js",
+      "static/css/vendors.css",
+      "static/chunks/vendors.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/upload/page.js"
+    ]
+  }
+}
