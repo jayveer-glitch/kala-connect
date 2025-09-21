@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: 'Artisan Story | KalaConnect',
       description: 'Discover the story behind this artistic journey through KalaConnect',
-      images: ['/kalaconnect-logo.png'],
+      images: ['https://res.cloudinary.com/dlspc4akf/image/upload/v1758462061/Screenshot_2025-09-21_125102_lferqv.png'],
       type: 'article',
     },
   }

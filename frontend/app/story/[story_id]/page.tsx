@@ -140,7 +140,7 @@ export default function PublicStoryPage() {
             <footer className="pt-12 mt-16 border-t border-charcoal/10">
               <div className="flex items-center space-x-4 mb-4">
                 <img 
-                  src="/kalaconnect-logo.png" 
+                  src="https://res.cloudinary.com/dlspc4akf/image/upload/v1758462061/Screenshot_2025-09-21_125102_lferqv.png" 
                   alt="KalaConnect Logo" 
                   className="w-8 h-8 object-contain"
                 />

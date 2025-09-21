@@ -233,8 +233,7 @@ checkpoints/
 # ==============================================
 # Keep Essential Files (Force Include)
 # ==============================================
-!public/images/logo.png
-!public/favicon.ico
+
 !public/apple-touch-icon.png
 !public/manifest.json
 !README.md

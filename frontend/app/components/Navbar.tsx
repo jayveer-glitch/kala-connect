@@ -45,7 +45,7 @@ export default function Navbar() {
                 <div className="relative">
                   <div className="w-12 h-12 rounded-full overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 bg-white/80 backdrop-blur-sm flex items-center justify-center">
                     <img 
-                      src="/images/logo.png" 
+                      src="https://res.cloudinary.com/dlspc4akf/image/upload/v1758462061/Screenshot_2025-09-21_125102_lferqv.png" 
                       alt="KalaConnect Logo" 
                       className="w-10 h-10 object-cover rounded-full"
                     />

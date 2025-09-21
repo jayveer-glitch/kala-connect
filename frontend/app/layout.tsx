@@ -32,13 +32,13 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.ico',
     apple: '/apple-touch-icon.png',
-    shortcut: '/images/logo.png',
+    shortcut: 'https://res.cloudinary.com/dlspc4akf/image/upload/v1758462061/Screenshot_2025-09-21_125102_lferqv.png',
   },
   manifest: '/manifest.json',
   openGraph: {
     title: 'KalaConnect - Your Hands Create the Art. Let AI Tell the Story.',
     description: 'Transform traditional craftsmanship into digital stories through AI-powered innovation, empowering artisans to share their heritage with the world.',
-    images: ['/images/logo.png'],
+    images: ['https://res.cloudinary.com/dlspc4akf/image/upload/v1758462061/Screenshot_2025-09-21_125102_lferqv.png'],
   },
 }
 
