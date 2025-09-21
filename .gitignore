@@ -25,6 +25,11 @@ build/
 dist/
 
 # Environment Variables & Secrets
+frontend/.env.local
+backend/.env.local
+frontend/.env
+backend/.env
+
 .env
 .env.local
 .env.development.local

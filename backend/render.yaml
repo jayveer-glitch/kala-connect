@@ -1,0 +1,15 @@
+# Render Deployment Configuration
+
+## Build Command
+pip install -r requirements.txt
+
+## Start Command  
+uvicorn main:app --host 0.0.0.0 --port $PORT
+
+## Environment Variables (Set in Render Dashboard)
+GOOGLE_API_KEY=your_actual_gemini_api_key_here
+OPENROUTER_API_KEY=your_actual_openrouter_api_key_here
+FRONTEND_URL=https://kalaconnect.onrender.com
+
+## Runtime Configuration
+PYTHON_VERSION=3.11

@@ -4,17 +4,24 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { HiUpload, HiSparkles, HiPhotograph, HiLightningBolt, HiEye, HiDownload, HiRefresh, HiArrowLeft } from 'react-icons/hi';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { apiConfig } from '../utils/apiConfig';
 
 const AdMockupGenerator: React.FC = () => {
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedMockups, setGeneratedMockups] = useState<string[]>([]);
+  const [uploadedImage, setUploadedImage] = useState<string>('/api/placeholder/400/600');
   const router = useRouter();
   const searchParams = useSearchParams();
   const { scrollY } = useScroll();
 
-  // Get the uploaded image from URL params or use a default gallery image
-  const uploadedImage = searchParams.get('image') || '/api/placeholder/400/600';
+  // Load the uploaded image from sessionStorage on component mount
+  useEffect(() => {
+    const uploadedImageData = sessionStorage.getItem('uploadedImage');
+    if (uploadedImageData) {
+      setUploadedImage(uploadedImageData);
+    }
+  }, []);
 
   // Parallax effects
   const backgroundY = useTransform(scrollY, [0, 500], [0, 150]);
@@ -25,25 +32,63 @@ const AdMockupGenerator: React.FC = () => {
     
     setIsGenerating(true);
     
-    // Here you would call your backend API with the image and prompt
-    // const response = await fetch('/api/generate-mockup', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ image: uploadedImage, prompt })
-    // });
-    
-    // Simulate API call with delay
-    setTimeout(() => {
-      // Mock generated mockups
-      const mockMockups = [
-        'https://picsum.photos/400/600?random=1',
-        'https://picsum.photos/400/600?random=2',
-        'https://picsum.photos/400/600?random=3',
-        'https://picsum.photos/400/600?random=4'
-      ];
-      setGeneratedMockups(mockMockups);
+    try {
+      // Get the uploaded image from sessionStorage
+      const uploadedImageData = sessionStorage.getItem('uploadedImage');
+      if (!uploadedImageData) {
+        console.error('No uploaded image found');
+        setIsGenerating(false);
+        return;
+      }
+
+      // Convert base64 to blob for FormData
+      const response = await fetch(uploadedImageData);
+      const blob = await response.blob();
+      
+      // Create FormData to send the image and context
+      const formData = new FormData();
+      formData.append('image', blob, 'uploaded_image.jpg');
+      formData.append('context', prompt);
+
+      // Call the backend API
+      const apiResponse = await fetch(apiConfig.endpoints.mockup, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!apiResponse.ok) {
+        const errorText = await apiResponse.text();
+        console.error('API Response Error:', errorText);
+        throw new Error(`HTTP error! status: ${apiResponse.status}, response: ${errorText}`);
+      }
+
+      const result = await apiResponse.json();
+      console.log('Backend response:', result);
+      
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      // Check if we have a valid URL in the response
+      if (result.url) {
+        // Set the single generated mockup
+        setGeneratedMockups([`${apiConfig.baseURL}${result.url}`]);
+        console.log('Generated mockup URL:', `${apiConfig.baseURL}${result.url}`);
+      } else {
+        console.error('No URL found in backend response:', result);
+        throw new Error('No image URL returned from backend');
+      }
+      
+    } catch (error) {
+      console.error('Error generating mockup:', error);
+      // Show error message to user instead of fallback image
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      alert(`Failed to generate mockup: ${errorMessage}. Please check if the backend server is running and try again.`);
+      // Don't set fallback image, let user try again
+      return;
+    } finally {
       setIsGenerating(false);
-    }, 3000);
+    }
   };
 
   // Floating particles animation
@@ -405,79 +450,97 @@ const AdMockupGenerator: React.FC = () => {
                 transition={{ delay: 0.2 }}
               >
                 <h2 className="font-playfair text-4xl font-bold text-charcoal mb-4">
-                  Your Ad Mockups Are Ready! 🎉
+                  Your Ad Mockup Is Ready! 🎉
                 </h2>
                 <p className="font-inter text-charcoal/60 text-lg">
-                  Choose your favorite and download in high resolution
+                  Download your professionally generated mockup
                 </p>
               </motion.div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {generatedMockups.map((mockup, index) => (
-                  <motion.div
-                    key={index}
-                    className="relative group cursor-pointer"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.1, type: "spring", stiffness: 200 }}
-                    whileHover={{ scale: 1.05, y: -10 }}
+              {/* Single Centered Mockup */}
+              <div className="flex justify-center">
+                <motion.div
+                  className="relative group cursor-pointer max-w-md"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: "spring", stiffness: 200 }}
+                  whileHover={{ scale: 1.02, y: -5 }}
+                >
+                  <div
+                    className="bg-white rounded-2xl p-6 shadow-2xl border border-charcoal/10 overflow-hidden"
+                    style={{
+                      backgroundImage: `
+                        radial-gradient(circle at 25% 25%, rgba(0,71,171,0.05) 0%, transparent 25%),
+                        radial-gradient(circle at 75% 75%, rgba(224,122,95,0.05) 0%, transparent 25%)
+                      `
+                    }}
                   >
-                    <div
-                      className="bg-white rounded-2xl p-4 shadow-xl border border-charcoal/10 overflow-hidden"
-                      style={{
-                        backgroundImage: `
-                          radial-gradient(circle at 25% 25%, rgba(0,71,171,0.05) 0%, transparent 25%),
-                          radial-gradient(circle at 75% 75%, rgba(224,122,95,0.05) 0%, transparent 25%)
-                        `
-                      }}
-                    >
-                      <motion.img
-                        src={mockup}
-                        alt={`Ad mockup ${index + 1}`}
-                        className="w-full h-64 object-cover rounded-xl"
-                        whileHover={{ scale: 1.1 }}
-                        transition={{ duration: 0.3 }}
-                      />
+                    <motion.img
+                      src={generatedMockups[0]}
+                      alt="Generated ad mockup"
+                      className="w-full h-96 object-cover rounded-xl shadow-lg"
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.3 }}
+                    />
 
-                      {/* Hover overlay */}
-                      <motion.div
-                        className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100"
-                        transition={{ duration: 0.3 }}
-                      >
-                        <div className="flex space-x-4">
-                          <motion.button
-                            className="bg-white/20 p-3 rounded-full backdrop-blur-sm"
-                            whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.3)' }}
-                            whileTap={{ scale: 0.9 }}
-                          >
-                            <HiEye className="w-6 h-6 text-white" />
-                          </motion.button>
-                          <motion.button
-                            className="bg-white/20 p-3 rounded-full backdrop-blur-sm"
-                            whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.3)' }}
-                            whileTap={{ scale: 0.9 }}
-                          >
-                            <HiDownload className="w-6 h-6 text-white" />
-                          </motion.button>
-                        </div>
-                      </motion.div>
-                    </div>
-
+                    {/* Hover overlay */}
                     <motion.div
-                      className="mt-4 text-center"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.5 + index * 0.1 }}
+                      className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100"
+                      transition={{ duration: 0.3 }}
                     >
-                      <h4 className="font-playfair text-lg font-semibold text-charcoal">
-                        Mockup {index + 1}
-                      </h4>
-                      <p className="font-inter text-charcoal/60 text-sm">
-                        AI Generated • High Resolution
-                      </p>
+                      <div className="flex space-x-4">
+                        <motion.button
+                          className="bg-white/20 p-4 rounded-full backdrop-blur-sm hover:bg-white/30"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => window.open(generatedMockups[0], '_blank')}
+                        >
+                          <HiEye className="w-6 h-6 text-white" />
+                        </motion.button>
+                        <motion.button
+                          className="bg-cobalt/20 p-4 rounded-full backdrop-blur-sm hover:bg-cobalt/30"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => {
+                            const link = document.createElement('a');
+                            link.href = generatedMockups[0];
+                            link.download = 'ad-mockup.jpg';
+                            link.click();
+                          }}
+                        >
+                          <HiDownload className="w-6 h-6 text-white" />
+                        </motion.button>
+                      </div>
                     </motion.div>
-                  </motion.div>
-                ))}
+                  </div>
+
+                  {/* Action Buttons Below */}
+                  <div className="flex justify-center space-x-4 mt-6">
+                    <motion.button
+                      onClick={() => {
+                        const link = document.createElement('a');
+                        link.href = generatedMockups[0];
+                        link.download = 'ad-mockup.jpg';
+                        link.click();
+                      }}
+                      className="bg-cobalt text-white px-6 py-3 rounded-full font-semibold flex items-center space-x-2 hover:bg-cobalt/90 transition-colors"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <HiDownload className="w-5 h-5" />
+                      <span>Download</span>
+                    </motion.button>
+                    <motion.button
+                      onClick={() => setGeneratedMockups([])}
+                      className="bg-gray-500 text-white px-6 py-3 rounded-full font-semibold flex items-center space-x-2 hover:bg-gray-600 transition-colors"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <HiRefresh className="w-5 h-5" />
+                      <span>Generate New</span>
+                    </motion.button>
+                  </div>
+                </motion.div>
               </div>
 
               <motion.div

@@ -1,0 +1,14 @@
+# Frontend Render Configuration
+
+## Build Command
+npm ci && npm run build
+
+## Start Command (for static sites)
+npm start
+
+## Environment Variables (Set in Render Dashboard)
+NEXT_PUBLIC_API_URL=https://kalaconnect-backend.onrender.com
+NEXT_PUBLIC_SITE_URL=https://kalaconnect.onrender.com
+
+## Node Version
+NODE_VERSION=18

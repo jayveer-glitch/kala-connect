@@ -16,6 +16,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import CustomScrollbar from '../components/CustomScrollbar';
 import ScrollbarBackground from '../components/ScrollbarBackground';
 import ArtisticCursor from '../components/ArtisticCursor';
+import { apiConfig } from '../utils/apiConfig';
 
 // Mock data for demonstration
 const galleryContent = {
@@ -28,7 +29,7 @@ const galleryContent = {
   productDescription: {
     title: "Handcrafted Block-Printed Cotton Textile",
     description: "This exquisite piece showcases the timeless art of hand-block printing, a traditional Indian craft that has been perfected over centuries. Each motif is carefully carved into wooden blocks and hand-pressed with natural dyes onto pure cotton fabric. The intricate geometric patterns and vibrant colors tell the story of skilled artisans who have preserved this ancient technique through generations.",
-    features: ["100% Pure Cotton", "Natural Dyes", "Hand-Block Printed", "Artisan Made", "Traditional Technique"]
+    features: ["Pure Cotton", "Natural Dyes", "Hand-Block", "Artisan Made", "Traditional"]
   },
   videoScript: {
     title: "The Art of Hand-Block Printing",
@@ -91,9 +92,9 @@ const galleryContent = {
   },
   marketplace: {
     recommendations: [
-      { name: "Etsy", logo: "🛍️", confidence: 95, reason: "Perfect for handmade, traditional crafts with strong artisan story" },
-      { name: "Novica", logo: "🌍", confidence: 88, reason: "Specializes in authentic cultural artwork from around the world" },
-      { name: "Amazon Handmade", logo: "📦", confidence: 75, reason: "Large audience for unique, handcrafted items" }
+      { name: "Etsy", logo: "🛍️", confidence: 95, reason: "Perfect for handmade, traditional crafts with strong artisan story", url: "https://www.etsy.com/sell" },
+      { name: "Novica", logo: "🌍", confidence: 88, reason: "Specializes in authentic cultural artwork from around the world", url: "https://www.novica.com/cust/sell/" },
+      { name: "Amazon Handmade", logo: "📦", confidence: 75, reason: "Large audience for unique, handcrafted items", url: "https://services.amazon.com/handmade/handmade.html" }
     ]
   }
 };
@@ -219,7 +220,20 @@ const InstagramCard: React.FC = () => {
   const [copyStatus, setCopyStatus] = useState('Copy Post');
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(galleryContent.instagram.caption);
+    if (typeof window === 'undefined') return;
+    const finalStory = sessionStorage.getItem('finalStory');
+    let caption = galleryContent.instagram.caption;
+    
+    if (finalStory) {
+      try {
+        const parsedStory = JSON.parse(finalStory);
+        caption = parsedStory.final_content?.instagram_post || caption;
+      } catch (error) {
+        console.error('Error parsing story data:', error);
+      }
+    }
+    
+    navigator.clipboard.writeText(caption);
     setCopyStatus('Copied!');
     setTimeout(() => setCopyStatus('Copy Post'), 2000);
   };
@@ -288,7 +302,7 @@ const InstagramCard: React.FC = () => {
           transition={{ duration: 0.8, delay: 0.3 }}
         >
           <img
-            src={galleryContent.image}
+            src={typeof window !== 'undefined' ? (sessionStorage.getItem('uploadedImage') || galleryContent.image) : galleryContent.image}
             alt="Craft artwork"
             className="w-full h-full object-cover"
           />
@@ -302,7 +316,21 @@ const InstagramCard: React.FC = () => {
           transition={{ delay: 0.5 }}
         >
           <p className="font-inter text-gray-300 text-sm leading-relaxed">
-            <span className="font-semibold">kala_connect</span> {galleryContent.instagram.caption}
+            <span className="font-semibold">kala_connect</span> {
+              (() => {
+                if (typeof window === 'undefined') return galleryContent.instagram.caption;
+                const finalStory = sessionStorage.getItem('finalStory');
+                if (finalStory) {
+                  try {
+                    const parsedStory = JSON.parse(finalStory);
+                    return parsedStory.final_content?.instagram_post || galleryContent.instagram.caption;
+                  } catch (error) {
+                    console.error('Error parsing story data:', error);
+                  }
+                }
+                return galleryContent.instagram.caption;
+              })()
+            }
           </p>
         </motion.div>
 
@@ -339,7 +367,20 @@ const ProductDescriptionCard: React.FC = () => {
   const [copyStatus, setCopyStatus] = useState('Copy Description');
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(galleryContent.productDescription.description);
+    if (typeof window === 'undefined') return;
+    const finalStory = sessionStorage.getItem('finalStory');
+    let description = galleryContent.productDescription.description;
+    
+    if (finalStory) {
+      try {
+        const parsedStory = JSON.parse(finalStory);
+        description = parsedStory.final_content?.product_description || description;
+      } catch (error) {
+        console.error('Error parsing story data:', error);
+      }
+    }
+    
+    navigator.clipboard.writeText(description);
     setCopyStatus('Copied!');
     setTimeout(() => setCopyStatus('Copy Description'), 2000);
   };
@@ -396,7 +437,20 @@ const ProductDescriptionCard: React.FC = () => {
           animate={isRevealed ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.3 }}
         >
-          {galleryContent.productDescription.title}
+          {(() => {
+            if (typeof window === 'undefined') return galleryContent.productDescription.title;
+            const finalStory = sessionStorage.getItem('finalStory');
+            if (finalStory) {
+              try {
+                const parsedStory = JSON.parse(finalStory);
+                const artForm = parsedStory.final_content?.art_classification?.art_form_name;
+                return artForm || galleryContent.productDescription.title;
+              } catch (error) {
+                console.error('Error parsing story data:', error);
+              }
+            }
+            return galleryContent.productDescription.title;
+          })()}
         </motion.h2>
 
         <motion.p
@@ -405,7 +459,21 @@ const ProductDescriptionCard: React.FC = () => {
           animate={isRevealed ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.5 }}
         >
-          {galleryContent.productDescription.description}
+          {
+            (() => {
+              if (typeof window === 'undefined') return galleryContent.productDescription.description;
+              const finalStory = sessionStorage.getItem('finalStory');
+              if (finalStory) {
+                try {
+                  const parsedStory = JSON.parse(finalStory);
+                  return parsedStory.final_content?.product_description || galleryContent.productDescription.description;
+                } catch (error) {
+                  console.error('Error parsing story data:', error);
+                }
+              }
+              return galleryContent.productDescription.description;
+            })()
+          }
         </motion.p>
 
         <motion.div
@@ -414,7 +482,23 @@ const ProductDescriptionCard: React.FC = () => {
           animate={isRevealed ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.7 }}
         >
-          {galleryContent.productDescription.features.map((feature, index) => (
+          {(() => {
+            if (typeof window === 'undefined') return galleryContent.productDescription.features;
+            
+            const finalStory = sessionStorage.getItem('finalStory');
+            if (finalStory) {
+              try {
+                const parsedStory = JSON.parse(finalStory);
+                const features = parsedStory.final_content?.product_features;
+                if (features && Array.isArray(features) && features.length > 0) {
+                  return features;
+                }
+              } catch (error) {
+                console.error('Error parsing story data:', error);
+              }
+            }
+            return galleryContent.productDescription.features;
+          })().map((feature: string, index: number) => (
             <motion.div
               key={feature}
               className="flex items-center space-x-2 p-2 bg-gray-700/30 rounded-lg"
@@ -462,7 +546,32 @@ const VideoScriptCard: React.FC = () => {
   const [currentScene, setCurrentScene] = useState(0);
 
   const handleCopy = () => {
-    const scriptText = galleryContent.videoScript.scenes.map(scene => `${scene.scene}: ${scene.visuals.action}\nAudio: ${scene.audio.voiceover}`).join('\n\n');
+    if (typeof window === 'undefined') return;
+    const finalStory = sessionStorage.getItem('finalStory');
+    let scriptText = galleryContent.videoScript.scenes.map(scene => `${scene.scene}: ${scene.visuals.action}\nAudio: ${scene.audio.voiceover}`).join('\n\n');
+    
+    if (finalStory) {
+      try {
+        const parsedStory = JSON.parse(finalStory);
+        const videoScript = parsedStory.final_content?.video_script;
+        if (videoScript) {
+          if (typeof videoScript === 'string') {
+            scriptText = videoScript;
+          } else if (videoScript.timeline && Array.isArray(videoScript.timeline)) {
+            // Handle backend timeline structure
+            scriptText = videoScript.timeline.map((scene: any) => 
+              `${scene.time}: ${scene.visuals.action}\nAudio: ${scene.audio.voiceover}`
+            ).join('\n\n');
+          } else if (videoScript.scenes) {
+            // Fallback to old scenes structure
+            scriptText = videoScript.scenes.map((scene: any) => `${scene.scene}: ${scene.visuals.action}\nAudio: ${scene.audio.voiceover}`).join('\n\n');
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing story data:', error);
+      }
+    }
+    
     navigator.clipboard.writeText(scriptText);
     setCopyStatus('Copied!');
     setTimeout(() => setCopyStatus('Copy Full Script'), 2000);
@@ -475,8 +584,26 @@ const VideoScriptCard: React.FC = () => {
 
   // Auto-advance scenes for demo effect
   useEffect(() => {
+    const getSceneCount = () => {
+      if (typeof window === 'undefined') return galleryContent.videoScript.scenes.length;
+      
+      const finalStory = sessionStorage.getItem('finalStory');
+      if (finalStory) {
+        try {
+          const parsedStory = JSON.parse(finalStory);
+          const videoScript = parsedStory.final_content?.video_script;
+          if (videoScript && videoScript.timeline && Array.isArray(videoScript.timeline)) {
+            return videoScript.timeline.length;
+          }
+        } catch (error) {
+          console.error('Error parsing story data:', error);
+        }
+      }
+      return galleryContent.videoScript.scenes.length;
+    };
+
     const interval = setInterval(() => {
-      setCurrentScene(prev => (prev + 1) % galleryContent.videoScript.scenes.length);
+      setCurrentScene(prev => (prev + 1) % getSceneCount());
     }, 4000);
     return () => clearInterval(interval);
   }, []);
@@ -513,16 +640,55 @@ const VideoScriptCard: React.FC = () => {
           </div>
           <div>
             <h3 className="font-playfair text-2xl font-bold text-white leading-tight mb-2">
-              {galleryContent.videoScript.title}
+              {(() => {
+                if (typeof window === 'undefined') return galleryContent.videoScript.title;
+                const finalStory = sessionStorage.getItem('finalStory');
+                if (finalStory) {
+                  try {
+                    const parsedStory = JSON.parse(finalStory);
+                    const videoScript = parsedStory.final_content?.video_script;
+                    return (videoScript?.title || galleryContent.videoScript.title);
+                  } catch (error) {
+                    console.error('Error parsing story data:', error);
+                  }
+                }
+                return galleryContent.videoScript.title;
+              })()}
             </h3>
             <div className="flex space-x-3">
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border border-amber-500/30">
                 <span className="mr-2">✨</span>
-                {galleryContent.videoScript.style}
+                {(() => {
+                  if (typeof window === 'undefined') return galleryContent.videoScript.style;
+                  const finalStory = sessionStorage.getItem('finalStory');
+                  if (finalStory) {
+                    try {
+                      const parsedStory = JSON.parse(finalStory);
+                      const videoScript = parsedStory.final_content?.video_script;
+                      return (videoScript?.style || galleryContent.videoScript.style);
+                    } catch (error) {
+                      console.error('Error parsing story data:', error);
+                    }
+                  }
+                  return galleryContent.videoScript.style;
+                })()}
               </span>
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-300 border border-purple-500/30">
                 <span className="mr-2">🎵</span>
-                {galleryContent.videoScript.bgMusic}
+                {(() => {
+                  if (typeof window === 'undefined') return galleryContent.videoScript.bgMusic;
+                  const finalStory = sessionStorage.getItem('finalStory');
+                  if (finalStory) {
+                    try {
+                      const parsedStory = JSON.parse(finalStory);
+                      const videoScript = parsedStory.final_content?.video_script;
+                      return (videoScript?.bg_music_suggestion || galleryContent.videoScript.bgMusic);
+                    } catch (error) {
+                      console.error('Error parsing story data:', error);
+                    }
+                  }
+                  return galleryContent.videoScript.bgMusic;
+                })()}
               </span>
             </div>
           </div>
@@ -548,7 +714,23 @@ const VideoScriptCard: React.FC = () => {
         <div className="w-1/4 p-6 border-r border-white/10 overflow-y-auto">
           <div className="text-sm text-gray-400 mb-4 uppercase tracking-wider font-medium">Timeline</div>
           <div className="space-y-3">
-            {galleryContent.videoScript.scenes.map((scene, index) => (
+            {(() => {
+              if (typeof window === 'undefined') return galleryContent.videoScript.scenes;
+              
+              const finalStory = sessionStorage.getItem('finalStory');
+              if (finalStory) {
+                try {
+                  const parsedStory = JSON.parse(finalStory);
+                  const videoScript = parsedStory.final_content?.video_script;
+                  if (videoScript && videoScript.timeline && Array.isArray(videoScript.timeline)) {
+                    return videoScript.timeline;
+                  }
+                } catch (error) {
+                  console.error('Error parsing story data:', error);
+                }
+              }
+              return galleryContent.videoScript.scenes;
+            })().map((scene: any, index: number) => (
               <motion.div
                 key={index}
                 className={`relative p-4 rounded-xl cursor-pointer transition-all duration-75 ${
@@ -561,7 +743,7 @@ const VideoScriptCard: React.FC = () => {
                 whileTap={{ scale: 0.98, transition: { duration: 0.05 } }}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-bold text-white">{scene.scene}</span>
+                  <span className="text-sm font-bold text-white">{scene.scene || `Scene ${index + 1}`}</span>
                   <span className="text-xs text-gray-400 font-mono bg-gray-800/50 px-2 py-1 rounded">{scene.time}</span>
                 </div>
                 <div className="w-full h-1.5 bg-white/10 rounded-full">
@@ -595,10 +777,42 @@ const VideoScriptCard: React.FC = () => {
             {/* Scene Header */}
             <div className="flex items-center justify-between mb-4 flex-shrink-0">
               <span className="inline-block px-4 py-2 rounded-xl text-lg font-bold bg-cobalt/20 text-blue-300 border border-cobalt/30">
-                {galleryContent.videoScript.scenes[currentScene].scene}
+                {(() => {
+                  if (typeof window === 'undefined') return galleryContent.videoScript.scenes[currentScene].scene;
+                  
+                  const finalStory = sessionStorage.getItem('finalStory');
+                  if (finalStory) {
+                    try {
+                      const parsedStory = JSON.parse(finalStory);
+                      const videoScript = parsedStory.final_content?.video_script;
+                      if (videoScript && videoScript.timeline && Array.isArray(videoScript.timeline)) {
+                        return videoScript.timeline[currentScene]?.time || `Scene ${currentScene + 1}`;
+                      }
+                    } catch (error) {
+                      console.error('Error parsing story data:', error);
+                    }
+                  }
+                  return galleryContent.videoScript.scenes[currentScene].scene;
+                })()}
               </span>
               <span className="text-sm text-gray-400 font-mono bg-gray-800/50 px-3 py-2 rounded-lg">
-                Scene {currentScene + 1} of {galleryContent.videoScript.scenes.length}
+                Scene {currentScene + 1} of {(() => {
+                  if (typeof window === 'undefined') return galleryContent.videoScript.scenes.length;
+                  
+                  const finalStory = sessionStorage.getItem('finalStory');
+                  if (finalStory) {
+                    try {
+                      const parsedStory = JSON.parse(finalStory);
+                      const videoScript = parsedStory.final_content?.video_script;
+                      if (videoScript && videoScript.timeline && Array.isArray(videoScript.timeline)) {
+                        return videoScript.timeline.length;
+                      }
+                    } catch (error) {
+                      console.error('Error parsing story data:', error);
+                    }
+                  }
+                  return galleryContent.videoScript.scenes.length;
+                })()}
               </span>
             </div>
 
@@ -613,15 +827,69 @@ const VideoScriptCard: React.FC = () => {
                 <div className="space-y-3 text-sm flex-1 overflow-y-auto">
                   <div>
                     <span className="text-gray-400 text-xs font-medium">Shot Type:</span>
-                    <div className="text-white font-semibold mt-1">{galleryContent.videoScript.scenes[currentScene].visuals.shot}</div>
+                    <div className="text-white font-semibold mt-1">
+                      {(() => {
+                        if (typeof window === 'undefined') return galleryContent.videoScript.scenes[currentScene].visuals.shot;
+                        
+                        const finalStory = sessionStorage.getItem('finalStory');
+                        if (finalStory) {
+                          try {
+                            const parsedStory = JSON.parse(finalStory);
+                            const videoScript = parsedStory.final_content?.video_script;
+                            if (videoScript && videoScript.timeline && Array.isArray(videoScript.timeline)) {
+                              return videoScript.timeline[currentScene]?.visuals?.camera_shot || 'Camera Shot';
+                            }
+                          } catch (error) {
+                            console.error('Error parsing story data:', error);
+                          }
+                        }
+                        return galleryContent.videoScript.scenes[currentScene].visuals.shot;
+                      })()}
+                    </div>
                   </div>
                   <div>
                     <span className="text-gray-400 text-xs font-medium">Action:</span>
-                    <div className="text-white leading-relaxed mt-1">{galleryContent.videoScript.scenes[currentScene].visuals.action}</div>
+                    <div className="text-white leading-relaxed mt-1">
+                      {(() => {
+                        if (typeof window === 'undefined') return galleryContent.videoScript.scenes[currentScene].visuals.action;
+                        
+                        const finalStory = sessionStorage.getItem('finalStory');
+                        if (finalStory) {
+                          try {
+                            const parsedStory = JSON.parse(finalStory);
+                            const videoScript = parsedStory.final_content?.video_script;
+                            if (videoScript && videoScript.timeline && Array.isArray(videoScript.timeline)) {
+                              return videoScript.timeline[currentScene]?.visuals?.action || 'Scene action';
+                            }
+                          } catch (error) {
+                            console.error('Error parsing story data:', error);
+                          }
+                        }
+                        return galleryContent.videoScript.scenes[currentScene].visuals.action;
+                      })()}
+                    </div>
                   </div>
                   <div>
                     <span className="text-gray-400 text-xs font-medium">B-Roll:</span>
-                    <div className="text-white mt-1">{galleryContent.videoScript.scenes[currentScene].visuals.broll}</div>
+                    <div className="text-white mt-1">
+                      {(() => {
+                        if (typeof window === 'undefined') return galleryContent.videoScript.scenes[currentScene].visuals.broll;
+                        
+                        const finalStory = sessionStorage.getItem('finalStory');
+                        if (finalStory) {
+                          try {
+                            const parsedStory = JSON.parse(finalStory);
+                            const videoScript = parsedStory.final_content?.video_script;
+                            if (videoScript && videoScript.timeline && Array.isArray(videoScript.timeline)) {
+                              return videoScript.timeline[currentScene]?.visuals?.b_roll_suggestion || 'B-roll content';
+                            }
+                          } catch (error) {
+                            console.error('Error parsing story data:', error);
+                          }
+                        }
+                        return galleryContent.videoScript.scenes[currentScene].visuals.broll;
+                      })()}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -635,11 +903,47 @@ const VideoScriptCard: React.FC = () => {
                 <div className="space-y-3 text-sm flex-1 overflow-y-auto">
                   <div>
                     <span className="text-gray-400 text-xs font-medium">Voiceover:</span>
-                    <div className="text-white leading-relaxed italic mt-1">"{galleryContent.videoScript.scenes[currentScene].audio.voiceover}"</div>
+                    <div className="text-white leading-relaxed italic mt-1">
+                      "{(() => {
+                        if (typeof window === 'undefined') return galleryContent.videoScript.scenes[currentScene].audio.voiceover;
+                        
+                        const finalStory = sessionStorage.getItem('finalStory');
+                        if (finalStory) {
+                          try {
+                            const parsedStory = JSON.parse(finalStory);
+                            const videoScript = parsedStory.final_content?.video_script;
+                            if (videoScript && videoScript.timeline && Array.isArray(videoScript.timeline)) {
+                              return videoScript.timeline[currentScene]?.audio?.voiceover || 'Voiceover content';
+                            }
+                          } catch (error) {
+                            console.error('Error parsing story data:', error);
+                          }
+                        }
+                        return galleryContent.videoScript.scenes[currentScene].audio.voiceover;
+                      })()}"
+                    </div>
                   </div>
                   <div>
                     <span className="text-gray-400 text-xs font-medium">Sound Effects:</span>
-                    <div className="text-white mt-1">{galleryContent.videoScript.scenes[currentScene].audio.sfx}</div>
+                    <div className="text-white mt-1">
+                      {(() => {
+                        if (typeof window === 'undefined') return galleryContent.videoScript.scenes[currentScene].audio.sfx;
+                        
+                        const finalStory = sessionStorage.getItem('finalStory');
+                        if (finalStory) {
+                          try {
+                            const parsedStory = JSON.parse(finalStory);
+                            const videoScript = parsedStory.final_content?.video_script;
+                            if (videoScript && videoScript.timeline && Array.isArray(videoScript.timeline)) {
+                              return videoScript.timeline[currentScene]?.audio?.sfx || 'Sound effects';
+                            }
+                          } catch (error) {
+                            console.error('Error parsing story data:', error);
+                          }
+                        }
+                        return galleryContent.videoScript.scenes[currentScene].audio.sfx;
+                      })()}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -670,6 +974,26 @@ const VideoScriptCard: React.FC = () => {
 const MarketplaceCard: React.FC = () => {
   const [isRevealed, setIsRevealed] = useState(false);
   const [hoveredMarketplace, setHoveredMarketplace] = useState<string | null>(null);
+
+  // Helper function to get marketplace URLs for legacy string format
+  const getMarketplaceUrl = (name: string): string => {
+    const urlMap: { [key: string]: string } = {
+      'Etsy': 'https://www.etsy.com/sell',
+      'Novica': 'https://www.novica.com/cust/sell/',
+      'Amazon Handmade': 'https://services.amazon.com/handmade/handmade.html',
+      'ArtFire': 'https://www.artfire.com/sell',
+      'Aftcra': 'https://www.aftcra.com/sell',
+      'Folksy': 'https://folksy.com/sell',
+      'Bonanza': 'https://www.bonanza.com/sell'
+    };
+    return urlMap[name] || '#';
+  };
+
+  const handleMarketplaceClick = (url: string, name: string) => {
+    if (url && url !== '#') {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   return (
     <motion.div
@@ -721,18 +1045,55 @@ const MarketplaceCard: React.FC = () => {
         </motion.h3>
 
         <div className="space-y-6 pb-20">
-          {galleryContent.marketplace.recommendations.map((marketplace, index) => (
+          {(() => {
+            if (typeof window === 'undefined') return galleryContent.marketplace.recommendations;
+            const finalStory = sessionStorage.getItem('finalStory');
+            if (finalStory) {
+              try {
+                const parsedStory = JSON.parse(finalStory);
+                const suggestions = parsedStory.final_content?.marketplace_suggestions;
+                if (suggestions && Array.isArray(suggestions)) {
+                  // Check if new object format with URLs
+                  if (suggestions.length > 0 && typeof suggestions[0] === 'object' && suggestions[0].name) {
+                    return suggestions.map((suggestion: any, index: number) => ({
+                      name: suggestion.name,
+                      logo: ['🛍️', '🌍', '📦', '🎨'][index] || '🛒',
+                      confidence: 90 - (index * 5),
+                      reason: suggestion.reason || `Great platform for selling ${suggestion.name.toLowerCase()} handmade crafts`,
+                      url: suggestion.url || '#'
+                    }));
+                  }
+                  // Legacy string array format
+                  else if (typeof suggestions[0] === 'string') {
+                    return suggestions.map((name: string, index: number) => ({
+                      name,
+                      logo: ['🛍️', '🌍', '📦', '🎨'][index] || '🛒',
+                      confidence: 90 - (index * 5),
+                      reason: `Great platform for ${name.toLowerCase()} selling handmade crafts`,
+                      url: getMarketplaceUrl(name)
+                    }));
+                  }
+                }
+              } catch (error) {
+                console.error('Error parsing story data:', error);
+              }
+            }
+            return galleryContent.marketplace.recommendations;
+          })().map((marketplace: any, index: number) => (
             <motion.div
               key={marketplace.name}
               className="relative"
             >
               <motion.div
-                className="flex items-center justify-between p-4 rounded-lg border border-gray-600 hover:shadow-md transition-all duration-300"
+                className="flex items-center justify-between p-4 rounded-lg border border-gray-600 hover:shadow-md transition-all duration-300 cursor-pointer hover:border-cobalt/50"
                 initial={{ opacity: 0, x: -20 }}
                 animate={isRevealed ? { opacity: 1, x: 0 } : {}}
                 transition={{ delay: 0.5 + index * 0.2 }}
                 onHoverStart={() => setHoveredMarketplace(marketplace.name)}
                 onHoverEnd={() => setHoveredMarketplace(null)}
+                onClick={() => handleMarketplaceClick(marketplace.url, marketplace.name)}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <div className="flex items-center space-x-3">
                   <motion.div
@@ -757,6 +1118,11 @@ const MarketplaceCard: React.FC = () => {
                     </div>
                   </div>
                 </div>
+                <div className="text-gray-400 hover:text-white transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </div>
               </motion.div>
               
               <AnimatePresence>
@@ -768,7 +1134,13 @@ const MarketplaceCard: React.FC = () => {
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <p className="font-inter text-gray-300 text-sm leading-relaxed">{marketplace.reason}</p>
+                    <p className="font-inter text-gray-300 text-sm leading-relaxed mb-2">{marketplace.reason}</p>
+                    <div className="flex items-center text-blue-400 text-xs">
+                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                      Click to visit marketplace
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -783,6 +1155,36 @@ const MarketplaceCard: React.FC = () => {
 // Pricing Oracle Card Component
 const PricingOracleCard: React.FC = () => {
   const [isRevealed, setIsRevealed] = useState(false);
+
+  // Get real pricing data or fallback to mock
+  const getPricingData = () => {
+    if (typeof window === 'undefined') return {
+      suggested_price_range: "$150 - $300",
+      pricing_factors: ["Complexity of design", "Time investment", "Material quality"],
+      market_positioning: "Premium handcrafted art"
+    };
+    
+    const finalStory = sessionStorage.getItem('finalStory');
+    if (finalStory) {
+      try {
+        const parsedStory = JSON.parse(finalStory);
+        return parsedStory.final_content?.pricing_guidance || {
+          suggested_price_range: "$150 - $300",
+          pricing_factors: ["Complexity of design", "Time investment", "Material quality"],
+          market_positioning: "Premium handcrafted art"
+        };
+      } catch (error) {
+        console.error('Error parsing story data:', error);
+      }
+    }
+    return {
+      suggested_price_range: "$150 - $300", 
+      pricing_factors: ["Complexity of design", "Time investment", "Material quality"],
+      market_positioning: "Premium handcrafted art"
+    };
+  };
+
+  const pricingData = getPricingData();
 
   useEffect(() => {
     const timer = setTimeout(() => setIsRevealed(true), 1000);
@@ -849,7 +1251,26 @@ const PricingOracleCard: React.FC = () => {
           transition={{ delay: 0.5 }}
         >
           <p className="text-black-300 text-sm mb-2">Recommended Price Range</p>
-          <h4 className="text-4xl font-bold text-cobalt">$150 - $300</h4>
+          <h4 className="text-4xl font-bold text-cobalt">{pricingData.suggested_price_range}</h4>
+          <p className="text-charcoal/70 text-sm mt-2">{pricingData.market_positioning}</p>
+        </motion.div>
+
+        {/* Pricing Factors */}
+        <motion.div
+          className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 mb-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isRevealed ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.6 }}
+        >
+          <p className="text-charcoal/70 text-sm mb-2 font-semibold">Pricing Factors:</p>
+          <ul className="text-charcoal text-sm space-y-1">
+            {pricingData.pricing_factors.map((factor: string, index: number) => (
+              <li key={index} className="flex items-center">
+                <span className="text-terracotta mr-2">•</span>
+                {factor}
+              </li>
+            ))}
+          </ul>
         </motion.div>
 
         {/* Market Comparison */}
@@ -884,9 +1305,35 @@ interface ToolModalProps {
   isOpen: boolean;
   onClose: () => void;
   tool: string;
+  // QR Code props
+  qrCodeUrl: string;
+  isGeneratingQR: boolean;
+  generateQRCode: () => void;
+  // Translation props
+  selectedLanguage: string;
+  setSelectedLanguage: (lang: string) => void;
+  translatedText: string;
+  isTranslating: boolean;
+  textToTranslate: string;
+  setTextToTranslate: (text: string) => void;
+  translateContent: () => void;
 }
 
-const ToolModal: React.FC<ToolModalProps> = ({ isOpen, onClose, tool }) => {
+const ToolModal: React.FC<ToolModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  tool,
+  qrCodeUrl,
+  isGeneratingQR,
+  generateQRCode,
+  selectedLanguage,
+  setSelectedLanguage,
+  translatedText,
+  isTranslating,
+  textToTranslate,
+  setTextToTranslate,
+  translateContent
+}) => {
   const renderModalContent = () => {
     switch (tool) {
       case 'qr':
@@ -894,25 +1341,75 @@ const ToolModal: React.FC<ToolModalProps> = ({ isOpen, onClose, tool }) => {
           <div className="text-center p-6">
             <HiQrcode className="w-16 h-16 text-cobalt mx-auto mb-6" />
             <h3 className="font-playfair text-3xl font-bold text-charcoal mb-4">QR Code Generator</h3>
-            <div className="w-48 h-48 mx-auto mb-6 border-2 border-cobalt/20 rounded-xl flex items-center justify-center bg-gray-50">
-              <motion.div
-                className="grid grid-cols-8 gap-1"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                {[...Array(64)].map((_, i) => (
+            
+            {qrCodeUrl ? (
+              <div className="w-48 h-48 mx-auto mb-6 border-2 border-cobalt/20 rounded-xl overflow-hidden bg-white">
+                <img 
+                  src={qrCodeUrl} 
+                  alt="Generated QR Code" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            ) : (
+              <div className="w-48 h-48 mx-auto mb-6 border-2 border-cobalt/20 rounded-xl flex items-center justify-center bg-gray-50">
+                {isGeneratingQR ? (
                   <motion.div
-                    key={i}
-                    className="w-2 h-2 bg-charcoal rounded-sm"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: Math.random() > 0.5 ? 1 : 0 }}
-                    transition={{ delay: i * 0.01 }}
+                    className="w-8 h-8 border-4 border-cobalt border-t-transparent rounded-full"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                   />
-                ))}
-              </motion.div>
+                ) : (
+                  <motion.div
+                    className="grid grid-cols-8 gap-1"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {[...Array(64)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="w-2 h-2 bg-charcoal rounded-sm"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: Math.random() > 0.5 ? 1 : 0 }}
+                        transition={{ delay: i * 0.01 }}
+                      />
+                    ))}
+                  </motion.div>
+                )}
+              </div>
+            )}
+            
+            <p className="font-inter text-charcoal/70 text-lg mb-6">
+              {qrCodeUrl ? 'Scan to view your artwork story!' : 'Generate a QR code to share your artwork'}
+            </p>
+            
+            <div className="flex justify-center space-x-4">
+              <motion.button
+                onClick={generateQRCode}
+                disabled={isGeneratingQR}
+                className="bg-cobalt text-white px-6 py-3 rounded-xl font-semibold disabled:opacity-50"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {isGeneratingQR ? 'Generating...' : qrCodeUrl ? 'Regenerate QR' : 'Generate QR Code'}
+              </motion.button>
+              
+              {qrCodeUrl && (
+                <motion.button
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = qrCodeUrl;
+                    link.download = 'artwork-qr-code.png';
+                    link.click();
+                  }}
+                  className="bg-emerald-500 text-white px-6 py-3 rounded-xl font-semibold"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Download QR
+                </motion.button>
+              )}
             </div>
-            <p className="font-inter text-charcoal/70 text-lg">Scan to view your artwork story!</p>
           </div>
         );
 
@@ -980,32 +1477,91 @@ const ToolModal: React.FC<ToolModalProps> = ({ isOpen, onClose, tool }) => {
           <div className="p-6">
             <HiTranslate className="w-16 h-16 text-charcoal mx-auto mb-6" />
             <h3 className="font-playfair text-3xl font-bold text-charcoal mb-6 text-center">Universal Translator</h3>
-            <div className="space-y-6">
-              <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <p className="font-inter text-sm text-charcoal/70 mb-3 font-semibold">Hindi Translation:</p>
-                <motion.p
-                  className="font-inter text-charcoal text-lg"
-                  initial={{ width: 0 }}
-                  animate={{ width: '100%' }}
-                  transition={{ duration: 2 }}
-                  style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}
+            
+            {/* Language and Content Selection */}
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-semibold text-charcoal/70 mb-2">Select Language:</label>
+                <select
+                  value={selectedLanguage}
+                  onChange={(e) => setSelectedLanguage(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cobalt"
                 >
-                  हस्तशिल्प ब्लॉक प्रिंटिंग की पारंपरिक कला...
-                </motion.p>
+                  <option value="">Choose a language...</option>
+                  <option value="Hindi">Hindi (हिंदी)</option>
+                  <option value="Spanish">Spanish (Español)</option>
+                  <option value="French">French (Français)</option>
+                  <option value="German">German (Deutsch)</option>
+                  <option value="Japanese">Japanese (日本語)</option>
+                  <option value="Chinese">Chinese (中文)</option>
+                  <option value="Arabic">Arabic (العربية)</option>
+                  <option value="Portuguese">Portuguese (Português)</option>
+                </select>
               </div>
-              <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <p className="font-inter text-sm text-charcoal/70 mb-3 font-semibold">Spanish Translation:</p>
-                <motion.p
-                  className="font-inter text-charcoal text-lg"
-                  initial={{ width: 0 }}
-                  animate={{ width: '100%' }}
-                  transition={{ duration: 2, delay: 0.5 }}
-                  style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}
+              
+              <div>
+                <label className="block text-sm font-semibold text-charcoal/70 mb-2">Content to Translate:</label>
+                <select
+                  value={textToTranslate}
+                  onChange={(e) => setTextToTranslate(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-cobalt"
                 >
-                  El arte tradicional de la impresión en bloques...
-                </motion.p>
+                  <option value="description">Product Description</option>
+                  <option value="instagram">Instagram Post</option>
+                </select>
               </div>
             </div>
+
+            {/* Translation Button */}
+            <div className="text-center mb-6">
+              <motion.button
+                onClick={translateContent}
+                disabled={isTranslating || !selectedLanguage}
+                className="bg-charcoal text-white px-8 py-3 rounded-xl font-semibold disabled:opacity-50"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {isTranslating ? 'Translating...' : 'Translate Content'}
+              </motion.button>
+              
+              {/* Debug info */}
+              <div className="mt-4 text-xs text-gray-500">
+                Debug: {translatedText ? `Translation exists (${translatedText.length} chars)` : 'No translation'} | 
+                Language: {selectedLanguage || 'None'} | 
+                Translating: {isTranslating ? 'Yes' : 'No'}
+              </div>
+            </div>
+
+            {/* Translation Result */}
+            {translatedText && (
+              <div className="p-4 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-xl border border-emerald-200">
+                <p className="font-inter text-sm text-charcoal/70 mb-3 font-semibold">
+                  {selectedLanguage} Translation:
+                </p>
+                <motion.p
+                  className="font-inter text-charcoal text-lg leading-relaxed"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {translatedText}
+                </motion.p>
+                
+                <div className="mt-4 flex justify-end">
+                  <motion.button
+                    onClick={() => {
+                      navigator.clipboard.writeText(translatedText);
+                      alert('Translation copied to clipboard!');
+                    }}
+                    className="bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Copy Translation
+                  </motion.button>
+                </div>
+              </div>
+            )}
           </div>
         );
 
@@ -1094,16 +1650,47 @@ export default function GalleryPage() {
   const [windowSize, setWindowSize] = useState({ width: 1200, height: 800 });
   const [scriptCopyStatus, setScriptCopyStatus] = useState('Copy Script');
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // State for real story data
+  const [storyData, setStoryData] = useState<any>(null);
+  const [uploadedImage, setUploadedImage] = useState<string>('');
+  const [isClient, setIsClient] = useState(false);
 
-  const handleScriptCopy = () => {
-    const scriptText = galleryContent.videoScript.scenes.map(scene => `${scene.scene}: ${scene.visuals.action}\nAudio: ${scene.audio.voiceover}`).join('\n\n');
-    navigator.clipboard.writeText(scriptText);
-    setScriptCopyStatus('Copied!');
-    setTimeout(() => setScriptCopyStatus('Copy Script'), 2000);
-  };
+  // State for QR code functionality
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
+  const [isGeneratingQR, setIsGeneratingQR] = useState(false);
 
+  // State for translation functionality
+  const [selectedLanguage, setSelectedLanguage] = useState('');
+  const [translatedText, setTranslatedText] = useState('');
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [textToTranslate, setTextToTranslate] = useState('description');
+
+  // ALL useEffect hooks must be called before any conditional returns
+  // Load story data from sessionStorage
   useEffect(() => {
-    // Set window size on client side
+    setIsClient(true);
+    if (typeof window !== 'undefined') {
+      const finalStory = sessionStorage.getItem('finalStory');
+      const imageData = sessionStorage.getItem('uploadedImage');
+      
+      if (finalStory) {
+        try {
+          const parsedStory = JSON.parse(finalStory);
+          setStoryData(parsedStory);
+        } catch (error) {
+          console.error('Error parsing story data:', error);
+        }
+      }
+      
+      if (imageData) {
+        setUploadedImage(imageData);
+      }
+    }
+  }, []);
+
+  // Set window size on client side
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       setWindowSize({ width: window.innerWidth, height: window.innerHeight });
       
@@ -1116,6 +1703,135 @@ export default function GalleryPage() {
     }
   }, []);
 
+  // Mouse movement tracking
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('mousemove', handleMouseMove);
+      return () => window.removeEventListener('mousemove', handleMouseMove);
+    }
+  }, []);
+
+  // Define all functions before conditional return
+  const handleScriptCopy = () => {
+    let scriptText = '';
+    if (storyData?.final_content?.video_script) {
+      scriptText = storyData.final_content.video_script;
+    } else {
+      scriptText = galleryContent.videoScript.scenes.map(scene => `${scene.scene}: ${scene.visuals.action}\nAudio: ${scene.audio.voiceover}`).join('\n\n');
+    }
+    navigator.clipboard.writeText(scriptText);
+    setScriptCopyStatus('Copied!');
+    setTimeout(() => setScriptCopyStatus('Copy Script'), 2000);
+  };
+
+  // QR Code generation function
+  const generateQRCode = async () => {
+    setIsGeneratingQR(true);
+    try {
+      // Create a URL for the current gallery page (in production, this would be the actual URL)
+      const currentUrl = window.location.href;
+      
+      const response = await fetch(apiConfig.endpoints.generateQR, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url: currentUrl,
+          size: 10,
+          border: 4
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setQrCodeUrl(`${apiConfig.baseURL}${result.url}`);
+      } else {
+        console.error('Failed to generate QR code');
+        alert('Failed to generate QR code. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+      alert('Error generating QR code. Please check if the backend is running.');
+    } finally {
+      setIsGeneratingQR(false);
+    }
+  };
+
+  // Translation function
+  const translateContent = async () => {
+    if (!selectedLanguage) {
+      alert('Please select a language first.');
+      return;
+    }
+
+    setIsTranslating(true);
+    try {
+      let textContent = '';
+      
+      // Get the text to translate based on selection
+      if (textToTranslate === 'description' && storyData?.final_content?.product_description) {
+        textContent = storyData.final_content.product_description;
+      } else if (textToTranslate === 'instagram' && storyData?.final_content?.instagram_post) {
+        textContent = storyData.final_content.instagram_post;
+      } else {
+        // Fallback to gallery content
+        textContent = textToTranslate === 'description' 
+          ? galleryContent.productDescription.description 
+          : galleryContent.instagram.caption;
+      }
+
+      console.log('Translation request:', {
+        text_to_translate: textContent,
+        target_language: selectedLanguage,
+        context: textToTranslate === 'description' ? 'Product description' : 'Instagram post'
+      });
+
+      const response = await fetch(apiConfig.endpoints.translate, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text_to_translate: textContent,
+          target_language: selectedLanguage,
+          context: textToTranslate === 'description' ? 'Product description' : 'Instagram post'
+        })
+      });
+
+      console.log('Translation response status:', response.status);
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Translation result:', result);
+        if (result.translated_text) {
+          setTranslatedText(result.translated_text);
+          console.log('Translation state updated:', result.translated_text);
+        } else if (result.error) {
+          console.error('Backend returned error:', result.error);
+          alert(`Translation failed: ${result.error}`);
+        } else {
+          console.error('Unexpected response format:', result);
+          alert('Unexpected response format from translation service.');
+        }
+      } else {
+        const errorText = await response.text();
+        console.error('Failed to translate text. Status:', response.status, 'Response:', errorText);
+        alert(`Failed to translate text. Status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error translating text:', error);
+      alert('Error translating text. Please check if the backend is running.');
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  // Mouse movement effect
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
@@ -1129,7 +1845,26 @@ export default function GalleryPage() {
 
   const handleToolClick = (tool: string) => {
     setSelectedTool(tool);
+    
+    // Reset state when opening translation modal
+    if (tool === 'translate') {
+      setTranslatedText('');
+      setSelectedLanguage('');
+      setTextToTranslate('description');
+      setIsTranslating(false);
+    }
+    
+    // Reset state when opening QR modal
+    if (tool === 'qr') {
+      setQrCodeUrl('');
+      setIsGeneratingQR(false);
+    }
   };
+
+  // Don't render until client-side hydration is complete
+  if (!isClient) {
+    return <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100"></div>;
+  }
 
   // Masonry breakpoints
   const breakpointColumnsObj = {
@@ -1395,6 +2130,16 @@ export default function GalleryPage() {
           isOpen={!!selectedTool}
           onClose={() => setSelectedTool(null)}
           tool={selectedTool || ''}
+          qrCodeUrl={qrCodeUrl}
+          isGeneratingQR={isGeneratingQR}
+          generateQRCode={generateQRCode}
+          selectedLanguage={selectedLanguage}
+          setSelectedLanguage={setSelectedLanguage}
+          translatedText={translatedText}
+          isTranslating={isTranslating}
+          textToTranslate={textToTranslate}
+          setTextToTranslate={setTextToTranslate}
+          translateContent={translateContent}
         />
 
         {/* Custom CSS for fonts and scrollbars */}

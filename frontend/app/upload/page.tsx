@@ -157,15 +157,49 @@ export default function CanvasPage() {
     });
   }, [circleAnimation, backgroundAnimation]);
 
-  const handleAnalyze = () => {
-    if (!uploadedImage) return;
+  const handleAnalyze = async () => {
+    if (!uploadedImage || !selectedCategory) {
+      alert('Please select a category for your artwork');
+      return;
+    }
     
     setIsAnalyzing(true);
     
-    // Redirect to gallery page after analysis completes
-    setTimeout(() => {
-      router.push('/gallery');
-    }, 8000);
+    try {
+      // Convert data URL to blob
+      const response = await fetch(uploadedImage);
+      const blob = await response.blob();
+      
+      // Create form data
+      const formData = new FormData();
+      formData.append('image', blob, 'artwork.jpg');
+      formData.append('category', selectedCategory);
+      
+      // Call backend API
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const analysisResponse = await fetch(`${apiUrl}/generate-story`, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!analysisResponse.ok) {
+        throw new Error('Failed to analyze image');
+      }
+      
+      const analysisData = await analysisResponse.json();
+      
+      // Store the analysis data and redirect to conversation page
+      sessionStorage.setItem('analysisData', JSON.stringify(analysisData));
+      sessionStorage.setItem('uploadedImage', uploadedImage);
+      sessionStorage.setItem('selectedCategory', selectedCategory);
+      
+      router.push('/conversation_page');
+      
+    } catch (error) {
+      console.error('Error analyzing image:', error);
+      alert('Failed to analyze image. Please try again.');
+      setIsAnalyzing(false);
+    }
   };
 
   if (!mounted) {

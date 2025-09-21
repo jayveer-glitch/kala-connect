@@ -21,9 +21,7 @@ export default function Navbar() {
   const navigationItems = [
     { name: 'Home', href: '/', icon: '🏠' },
     { name: 'Upload', href: '/upload', icon: '📤' },
-    { name: 'Gallery', href: '/gallery', icon: '🎨' },
-    { name: 'Chat', href: '/conversation_page', icon: '💬' },
-    { name: 'Results', href: '/results', icon: '📊' }
+    { name: 'Gallery', href: '/gallery', icon: '🎨' }
   ]
 
   const isActive = (href: string) => {

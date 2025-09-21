@@ -50,18 +50,54 @@ export default function ConversationPage() {
   const [validationState, setValidationState] = useState<ValidationState>({});
   const [isFormValid, setIsFormValid] = useState(false);
   const [isReducedMotion, setIsReducedMotion] = useState(false);
+  
+  // State for backend data
+  const [analysisData, setAnalysisData] = useState<any>(null);
+  const [questions, setQuestions] = useState<string[]>([]);
+  const [aiDescription, setAiDescription] = useState<string>('');
 
   const titleRef = useRef<HTMLHeadingElement>(null);
   const paperRef = useRef<HTMLDivElement>(null);
   const intersectionObserverRef = useRef<IntersectionObserver | null>(null);
 
-  const questions = [
-    "What is the story behind this piece? What inspired its creation?",
-    "What materials and techniques were used in making this artwork?",
-    "What emotions or memories does this piece evoke for you?"
-  ];
-
-  const aiDescription = "A magnificent handcrafted ceramic piece, where ancient traditions meet contemporary artistry in perfect harmony.";
+  // Load analysis data from sessionStorage
+  useEffect(() => {
+    const storedAnalysisData = sessionStorage.getItem('analysisData');
+    if (storedAnalysisData) {
+      try {
+        const parsedData = JSON.parse(storedAnalysisData);
+        setAnalysisData(parsedData);
+        
+        // Parse the AI response to extract questions and description
+        const aiResponse = parsedData.ai_analysis;
+        try {
+          const cleanResponse = aiResponse.replace(/```json\n?/g, '').replace(/```/g, '').trim();
+          const responseData = JSON.parse(cleanResponse);
+          
+          setAiDescription(responseData.description || 'A beautiful handcrafted piece');
+          setQuestions(responseData.questions || [
+            "What is the story behind this piece? What inspired its creation?",
+            "What materials and techniques were used in making this artwork?", 
+            "What emotions or memories does this piece evoke for you?"
+          ]);
+        } catch (parseError) {
+          console.error('Error parsing AI response:', parseError);
+          // Use fallback questions
+          setQuestions([
+            "What is the story behind this piece? What inspired its creation?",
+            "What materials and techniques were used in making this artwork?",
+            "What emotions or memories does this piece evoke for you?"
+          ]);
+          setAiDescription('A beautiful handcrafted piece');
+        }
+      } catch (error) {
+        console.error('Error parsing analysis data:', error);
+      }
+    } else {
+      // Redirect back to upload if no data
+      window.location.href = '/upload';
+    }
+  }, []);
 
   // Check for reduced motion preference
   useEffect(() => {
@@ -168,7 +204,7 @@ export default function ConversationPage() {
   };
 
   const handleWeaveStory = async () => {
-    if (!isFormValid) return;
+    if (!isFormValid || !analysisData) return;
     
     setConversationState(prev => ({
       ...prev,
@@ -177,29 +213,52 @@ export default function ConversationPage() {
       currentStep: 'Weaving your story...'
     }));
 
-    // Simulate story generation with progress updates
-    const steps = [
-      'Analyzing your responses...',
-      'Gathering creative inspiration...',
-      'Weaving narrative threads...',
-      'Adding magical touches...',
-      'Finalizing your story...'
-    ];
-    
-    for (let i = 0; i < steps.length; i++) {
-      setTimeout(() => {
-        setConversationState(prev => ({
-          ...prev,
-          currentStep: steps[i],
-          completionProgress: ((i + 1) / steps.length) * 100
-        }));
-      }, i * 1500);
-    }
+    try {
+      // Prepare data for backend
+      const storyData = {
+        initial_description: aiDescription,
+        artisan_answers: conversationState.answers.filter(answer => answer.trim().length > 0)
+      };
 
-    setTimeout(() => {
-      // Navigate to results page
-      window.location.href = '/results';
-    }, 8000);
+      // Call the complete-story endpoint
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      
+      setConversationState(prev => ({ ...prev, currentStep: 'Calling AI storyteller...' }));
+      
+      const response = await fetch(`${apiUrl}/complete-story`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(storyData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate story');
+      }
+
+      const finalStoryData = await response.json();
+      
+      setConversationState(prev => ({ ...prev, currentStep: 'Story complete! Preparing your showcase...' }));
+      
+      // Store the final story data
+      sessionStorage.setItem('finalStory', JSON.stringify(finalStoryData));
+      
+      // Navigate to gallery with a delay
+      setTimeout(() => {
+        window.location.href = '/gallery';
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error generating story:', error);
+      alert('Failed to generate story. Please try again.');
+      setConversationState(prev => ({
+        ...prev,
+        isLoading: false,
+        showConstellationLoader: false,
+        currentStep: 'ready'
+      }));
+    }
   };
 
   if (conversationState.showConstellationLoader) {
