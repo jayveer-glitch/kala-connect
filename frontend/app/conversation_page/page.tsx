@@ -746,11 +746,16 @@ export default function ConversationPage() {
         }
 
         .typewriter-effect {
-          overflow: hidden;
-          border-right: 2px solid #0047AB;
-          white-space: nowrap;
-          animation: typing 2s steps(100) forwards, blink 1s infinite;
-          width: 0;
+          overflow: visible;
+          white-space: normal;
+          animation: fadeIn 2s ease-in-out forwards;
+          opacity: 0;
+          max-width: 100%;
+          word-wrap: break-word;
+        }
+
+        @keyframes fadeIn {
+          to { opacity: 1; }
         }
 
         @keyframes typing {
