@@ -7,6 +7,7 @@ import MagicalParticles from './components/MagicalParticles';
 import AudioFeedback from './components/AudioFeedback';
 import InkWell from './components/InkWell';
 import ConstellationLoader from './components/ConstellationLoader';
+import { apiConfig } from '../utils/apiConfig';
 import './styles/animations.css';
 
 const playfair = Playfair_Display({ 
@@ -220,12 +221,10 @@ export default function ConversationPage() {
         artisan_answers: conversationState.answers.filter(answer => answer.trim().length > 0)
       };
 
-      // Call the complete-story endpoint
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      
+      // Call the complete-story endpoint using apiConfig
       setConversationState(prev => ({ ...prev, currentStep: 'Calling AI storyteller...' }));
       
-      const response = await fetch(`${apiUrl}/complete-story`, {
+      const response = await fetch(apiConfig.endpoints.completeStory, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, useAnimation, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { apiConfig } from '../utils/apiConfig';
 
 // The Canvas - "Where Your Story Begins" 
 export default function CanvasPage() {
@@ -175,9 +176,11 @@ export default function CanvasPage() {
       formData.append('image', blob, 'artwork.jpg');
       formData.append('category', selectedCategory);
       
-      // Call backend API
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const analysisResponse = await fetch(`${apiUrl}/generate-story`, {
+      // Call backend API using apiConfig
+      console.log('🔍 Debug - API URL being called:', apiConfig.endpoints.generateStory);
+      console.log('🔍 Debug - Full apiConfig:', apiConfig);
+      
+      const analysisResponse = await fetch(apiConfig.endpoints.generateStory, {
         method: 'POST',
         body: formData,
       });

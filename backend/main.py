@@ -114,6 +114,7 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Local development
     "http://localhost:3001",  # Alternative local port
+    "http://localhost:3002",  # Alternative local port
     FRONTEND_URL,  # Production frontend URL
 ]
 
