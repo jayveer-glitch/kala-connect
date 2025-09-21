@@ -8,11 +8,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // You can fetch the story data here if needed
   // For now using static metadata
   return {
-    title: 'Story | Art Journey',
-    description: 'Discover the story behind this artistic journey',
+    title: 'Artisan Story | KalaConnect',
+    description: 'Discover the story behind this artistic journey through KalaConnect',
+    icons: {
+      icon: '/favicon.ico',
+      apple: '/apple-touch-icon.png',
+    },
     openGraph: {
-      title: 'Story | Art Journey',
-      description: 'Discover the story behind this artistic journey',
+      title: 'Artisan Story | KalaConnect',
+      description: 'Discover the story behind this artistic journey through KalaConnect',
+      images: ['/kalaconnect-logo.png'],
       type: 'article',
     },
   }

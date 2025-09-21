@@ -1,6 +1,6 @@
 import './globals.css'
 import { Playfair_Display, Inter, Poppins } from 'next/font/google'
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import Navbar from './components/Navbar'
 
 // Living Ink on Handmade Paper Typography
@@ -26,8 +26,25 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: 'KalaConnect - Your Hands Create the Art. Let AI Tell the Story.',
   description: 'Transform traditional craftsmanship into digital stories through AI-powered innovation, empowering artisans to share their heritage with the world.',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+    shortcut: '/images/logo.png',
+  },
+  manifest: '/manifest.json',
+  openGraph: {
+    title: 'KalaConnect - Your Hands Create the Art. Let AI Tell the Story.',
+    description: 'Transform traditional craftsmanship into digital stories through AI-powered innovation, empowering artisans to share their heritage with the world.',
+    images: ['/images/logo.png'],
+  },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({

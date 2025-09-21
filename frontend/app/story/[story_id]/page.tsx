@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import Head from 'next/head';
 import { Lora, Inter } from 'next/font/google';
 
 // --- ELEGANT TYPOGRAPHY SETUP ---
@@ -62,12 +61,6 @@ export default function PublicStoryPage() {
 
   return (
     <>
-      <Head>
-        <title>{storyData.title}</title>
-        <meta name="description" content={`Discover the story behind "${storyData.title}"`} />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-      </Head>
-
       <main className={`${inter.variable} ${lora.variable} relative overflow-hidden bg-gradient-to-br from-cream via-white to-gray-50`}>
         <ScrollProgress />
         
@@ -139,6 +132,14 @@ export default function PublicStoryPage() {
 
             {/* Footer */}
             <footer className="pt-12 mt-16 border-t border-charcoal/10">
+              <div className="flex items-center space-x-4 mb-4">
+                <img 
+                  src="/kalaconnect-logo.png" 
+                  alt="KalaConnect Logo" 
+                  className="w-8 h-8 object-contain"
+                />
+                <span className="text-charcoal/80 font-medium">KalaConnect</span>
+              </div>
               <p className="text-charcoal/60 text-sm">
                 A story by {storyData.artisanName}, brought to life by KalaConnect.
               </p>

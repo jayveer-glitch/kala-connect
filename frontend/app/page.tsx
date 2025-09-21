@@ -473,7 +473,7 @@ const ProblemSection = () => {
             className="pt-16 p-8 border-2 border-charcoal/20 rounded-3xl bg-white/30 backdrop-blur-sm shadow-2xl shadow-charcoal/20"
           >
             <div className="mx-auto w-96 h-64 bg-gradient-to-br from-terracotta/10 to-charcoal/10 rounded-2xl flex items-center justify-center shadow-2xl">
-              <div className="text-6xl">���</div>
+              <div className="text-6xl">?????</div>
             </div>
             <p className="mt-4 text-charcoal/50 font-inter italic">Beautiful crafts, waiting to be discovered...</p>
           </motion.div>
@@ -872,56 +872,56 @@ const FeaturesSection = () => {
       id: 1,
       title: "AI Story Generator",
       description: "Transform photos into compelling narratives with context-aware AI",
-      icon: "🤖",
+      icon: "https://img.icons8.com/pulsar-color/48/story-book.png",
       size: "large" // Takes 2x2 grid space
     },
     {
       id: 2,
       title: "Smart Upload",
       description: "One-click photo upload with automatic enhancement",
-      icon: "📸",
+      icon: "https://img.icons8.com/carbon-copy/100/apple-camera.png",
       size: "medium"
     },
     {
       id: 3,
       title: "Global Translation",
       description: "Share your story in 50+ languages instantly",
-      icon: "🌍",
+      icon: "https://img.icons8.com/pastel-glyph/64/translation.png",
       size: "medium"
     },
     {
       id: 4,
       title: "Pricing Oracle",
       description: "AI-powered price suggestions based on craft value and market data",
-      icon: "💰",
+      icon: "https://img.icons8.com/wired/64/tags.png",
       size: "large" 
     },
     {
       id: 5,
       title: "QR Story Tags",
       description: "Generate unique QR codes that link to your craft's story",
-      icon: "📱",
+      icon: "https://img.icons8.com/pastel-glyph/64/qr-code--v2.png",
       size: "medium"
     },
     {
       id: 6,
       title: "Voice Notes",
       description: "Record your inspiration and let AI craft the perfect caption",
-      icon: "🎤", 
+      icon: "https://img.icons8.com/ios/50/voice-memos--v1.png", 
       size: "medium"
     },
     {
       id: 7,
       title: "Heritage Stories",
       description: "Connect your craft to its cultural and historical roots",
-      icon: "📜",
+      icon: "https://img.icons8.com/ios/50/unesco--v1.png",
       size: "tall"
     },
     {
       id: 8,
       title: "Social Optimizer",
       description: "Perfect hashtags and posting times for maximum reach",
-      icon: "📈",
+      icon: "https://img.icons8.com/external-flatart-icons-outline-flatarticons/64/external-optimize-customer-relationship-and-employee-benefits-flatart-icons-outline-flatarticons.png",
       size: "wide"
     }
   ];
@@ -1021,10 +1021,10 @@ const FeatureCard = ({ feature, index, inView }: {
   const getGridClasses = (size: string) => {
     switch(size) {
       case 'large': return 'col-span-6 row-span-2';  // 2x2
-      case 'wide': return 'col-span-8 row-span-1';   // wide rectangle
+      case 'wide': return 'col-span-8 row-span-2';   // wide rectangle (increased height)
       case 'tall': return 'col-span-4 row-span-2';   // tall rectangle  
       case 'medium':
-      default: return 'col-span-4 row-span-1';       // standard rectangle
+      default: return 'col-span-4 row-span-2';       // standard rectangle (increased height)
     }
   };
 
@@ -1073,29 +1073,29 @@ const FeatureCard = ({ feature, index, inView }: {
         />
 
         {/* Content */}
-        <div className="absolute inset-0 flex flex-col">
+        <div className="relative flex flex-col h-full">
           
           {/* Header: Icon and Title Side by Side */}
           <div className={`flex items-center gap-4 ${feature.size === 'medium' ? 'mb-2' : 'mb-4'}`}>
             <motion.div
-              className="text-4xl lg:text-6xl"
+              className="w-12 h-12 lg:w-14 lg:h-14 bg-white/80 backdrop-blur-sm rounded-xl border border-white/50 shadow-lg flex items-center justify-center"
               animate={isHovered ? {
-                scale: [1, 1.2, 1.1],
-                rotate: [0, -5, 2, -1, 0]
-              } : {
-                y: [0, -4, 0],
-                rotate: [0, 1, -1, 0]
-              }}
-              transition={isHovered ? {
-                duration: 0.6,
-                ease: "easeOut"  
-              } : {
-                duration: 6,
-                repeat: Infinity,
-                ease: "easeInOut"
+                scale: 1.1
+              } : {}}
+              transition={{
+                duration: 0.3,
+                ease: "easeOut"
               }}
             >
-              {feature.icon}
+              {feature.icon.startsWith('http') ? (
+                <img 
+                  src={feature.icon} 
+                  alt={feature.title}
+                  className="w-6 h-6 lg:w-8 lg:h-8"
+                />
+              ) : (
+                <span className="text-xl lg:text-2xl">{feature.icon}</span>
+              )}
             </motion.div>
             
             <motion.h3 
@@ -1116,9 +1116,9 @@ const FeatureCard = ({ feature, index, inView }: {
           
           {/* Large Description Box */}
           <div className="flex-1">
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg h-full">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg h-full p-4 flex flex-col">
               <motion.p 
-                className="text-base lg:text-lg text-charcoal/90 font-inter font-medium leading-relaxed text-left p-4"
+                className="text-lg lg:text-xl text-charcoal/90 font-inter font-medium leading-relaxed text-left mb-1.5"
                 animate={isHovered ? {
                   y: -2,
                   opacity: 1
@@ -1126,6 +1126,125 @@ const FeatureCard = ({ feature, index, inView }: {
               >
                 {feature.description}
               </motion.p>
+              
+              {/* Additional content based on feature type */}
+              <div className="flex-1 flex flex-col justify-end">
+                {feature.id === 1 && (
+                  <div className="text-base text-charcoal/70 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Context-aware storytelling</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Multi-style narrative generation</span>
+                    </div>
+                  </div>
+                )}
+                
+                {feature.id === 2 && (
+                  <div className="text-base text-charcoal/70 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Organized by categories</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Smart cropping</span>
+                    </div>
+                  </div>
+                )}
+                
+                {feature.id === 3 && (
+                  <div className="text-base text-charcoal/70 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Real-time translation</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Cultural context preservation</span>
+                    </div>
+                  </div>
+                )}
+                
+                {feature.id === 4 && (
+                  <div className="text-base text-charcoal/70 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Market trend analysis</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Regional pricing data</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Craft complexity assessment</span>
+                    </div>
+                  </div>
+                )}
+                
+                {feature.id === 5 && (
+                  <div className="text-base text-charcoal/70 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Instant QR generation</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Trackable engagement</span>
+                    </div>
+                  </div>
+                )}
+                
+                {feature.id === 6 && (
+                  <div className="text-base text-charcoal/70 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Voice-to-text conversion</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>AI caption enhancement</span>
+                    </div>
+                  </div>
+                )}
+                
+                {feature.id === 7 && (
+                  <div className="text-base text-charcoal/70 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Historical context research</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Cultural significance mapping</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Artisan lineage tracking</span>
+                    </div>
+                  </div>
+                )}
+                
+                {feature.id === 8 && (
+                  <div className="text-base text-charcoal/70 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Optimal posting schedule</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Trending hashtag suggestions</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-cobalt rounded-full"></div>
+                      <span>Audience engagement insights</span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -1233,6 +1352,7 @@ const MissionSection = () => {
       name: "Blue Pottery",
       region: "Jaipur",
       emoji: "🏺",
+      image: "/images/bluepottery.jpg",
       color: "#0047AB",
       description: "Stunning cobalt ceramics"
     },
@@ -1240,7 +1360,7 @@ const MissionSection = () => {
       name: "Starry Night",
       region: "Europe",
       emoji: "🌌",
-      image: "/images/Starry-night.jpg",
+      image: "/images/Starrynights.jpg",
       color: "#f59e0b",
       description: "Swirling post-impressionist masterpiece"
     },
@@ -1248,6 +1368,7 @@ const MissionSection = () => {
       name: "Warli Art",
       region: "Maharashtra",
       emoji: "🖼️",
+      image: "/images/warliart.jpg",
       color: "#92400e",
       description: "Tribal wall paintings"
     },
@@ -1263,6 +1384,7 @@ const MissionSection = () => {
       name: "Kantha Embroidery",
       region: "Bengal",
       emoji: "🧵",
+      image: "/images/kanthaembroidery.jpg",
       color: "#E07A5F",
       description: "Running stitch storytelling"
     },
@@ -1270,7 +1392,7 @@ const MissionSection = () => {
       name: "The Great Wave",
       region: "Japan",
       emoji: "🌊",
-      image: "/images/great-wave.jpg",
+      image: "/images/greatwave.jpg",
       color: "#E07A5F",
       description: "Iconic woodblock print"
     },
@@ -1278,6 +1400,7 @@ const MissionSection = () => {
       name: "Tanjore Painting",
       region: "Tamil Nadu",
       emoji: "✨",
+      image: "/images/tanjore.jpg",
       color: "#f59e0b",
       description: "Gold leaf masterpieces"
     },
@@ -1293,6 +1416,7 @@ const MissionSection = () => {
       name: "Kalamkari",
       region: "Andhra Pradesh",
       emoji: "�️",
+      image: "/images/kalamkari.jpg",
       color: "#059669",
       description: "Hand-painted textile art"
     },
@@ -1309,6 +1433,7 @@ const MissionSection = () => {
       name: "Dhokra Art",
       region: "West Bengal",
       emoji: "🔥",
+      image: "/images/dhokra.jpg",
       color: "#7c2d12",
       description: "Lost-wax bronze casting"
     },
@@ -1316,7 +1441,7 @@ const MissionSection = () => {
       name: "Girl with Pearl Earring",
       region: "Netherlands",
       emoji: "💎",
-      image: "/images/girl-with-pearl.jpg",
+      image: "/images/pearlearring.jpg",
       color: "#7c2d12",
       description: "Luminous portrait masterpiece"
     },
@@ -1327,6 +1452,7 @@ const MissionSection = () => {
       name: "Chikankari",
       region: "Lucknow",
       emoji: "🪡",
+      image: "/images/chikankari.jpg",
       color: "#f5f5f5",
       description: "Delicate white embroidery"
     },
@@ -1334,6 +1460,7 @@ const MissionSection = () => {
       name: "Bidriware",
       region: "Karnataka",
       emoji: "⚫",
+      image: "/images/bidri.jpg",
       color: "#374151",
       description: "Inlaid metalwork"
     },
