@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react';
+import Head from 'next/head';
 import { Lora, Inter } from 'next/font/google';
 
 // --- ELEGANT TYPOGRAPHY SETUP ---
@@ -61,6 +62,11 @@ export default function PublicStoryPage() {
 
   return (
     <>
+      <Head>
+        <title>{storyData.title}</title>
+        <meta name="description" content={`Discover the story behind "${storyData.title}"`} />
+      </Head>
+
       <main className={`${inter.variable} ${lora.variable} relative overflow-hidden bg-gradient-to-br from-cream via-white to-gray-50`}>
         <ScrollProgress />
         
